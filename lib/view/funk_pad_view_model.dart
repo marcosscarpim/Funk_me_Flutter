@@ -29,8 +29,6 @@ class FunkPadViewModel with ChangeNotifier {
     audio.isPlaying = !audio.isPlaying;
     if (audio.isPlaying) {
       if (audio.type == FunkType.repeat) {
-        //audio.audioPlayer.setLoopMode(LoopMode.all);
-        //audio.audioPlayer.play();
         sincRepeatableAudios();
       } else {
         audio.audioPlayer.playerStateStream.listen((playerState) {

@@ -55,6 +55,7 @@ class FunkButton extends StatefulWidget {
 }
 
 class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
+  // Fade in / fade out animation
   late final AnimationController _controller = AnimationController(
     upperBound: 0.7,
     lowerBound: 0.0,
@@ -64,6 +65,11 @@ class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
   late final Animation<double> _animation = CurvedAnimation(
     parent: _controller,
     curve: Curves.linear,
+  );
+
+  late final AnimationController _controllerScale = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
   );
 
   controllerListener() {
@@ -79,16 +85,18 @@ class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
+    _controllerScale.dispose();
     super.dispose();
   }
 
   void updateController() {
     if (widget.audio.isPlaying) {
       _controller.addListener(controllerListener);
+      _controllerScale.forward();
       _controller.repeat(reverse: true);
     } else {
-      _controller.removeListener(controllerListener);
       _controller.stop();
+      _controllerScale.reverse();
       _controller.value = 0.0;
     }
   }
@@ -125,34 +133,54 @@ class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
     Color color = _getColor();
     return GestureDetector(
       onTap: _onButtonTapped,
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                color: color,
-                border: Border.all(color: color),
-                borderRadius: const BorderRadius.all(Radius.circular(20))),
-            width: 250,
-            height: 250,
-          ),
-          FadeTransition(
-            opacity: _animation,
-            child: Container(
+      child: LayoutBuilder(builder: (context, constraints) {
+        final Size biggest = constraints.biggest;
+        double smallIcon = constraints.biggest.width / 3;
+        double bigIcon = constraints.biggest.width / 1.5;
+
+        return Stack(
+          children: [
+            Container(
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.white),
+                  color: color,
+                  border: Border.all(color: color),
                   borderRadius: const BorderRadius.all(Radius.circular(20))),
               width: 250,
               height: 250,
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            alignment: Alignment.bottomRight,
-            child: ImageIcon(_getIcon()),
-          )
-        ],
-      ),
+            FadeTransition(
+              opacity: _animation,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.white),
+                    borderRadius: const BorderRadius.all(Radius.circular(20))),
+                width: 250,
+                height: 250,
+              ),
+            ),
+            PositionedTransition(
+              rect: RelativeRectTween(
+                begin: RelativeRect.fromSize(
+                    Rect.fromLTWH(biggest.width - smallIcon,
+                        biggest.height - smallIcon, smallIcon, smallIcon),
+                    biggest),
+                end: RelativeRect.fromSize(
+                    Rect.fromLTWH((biggest.width - bigIcon) / 2,
+                        (biggest.height - bigIcon) / 2, bigIcon, bigIcon),
+                    biggest),
+              ).animate(CurvedAnimation(
+                parent: _controllerScale,
+                curve: Curves.linear,
+              )),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                child: ImageIcon(_getIcon()),
+              ),
+            )
+          ],
+        );
+      }),
     );
   }
 }
