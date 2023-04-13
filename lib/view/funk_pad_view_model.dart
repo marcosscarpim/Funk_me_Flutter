@@ -10,10 +10,6 @@ class FunkPadViewModel with ChangeNotifier {
     return _funkAudios;
   }
 
-  final List<AudioPlayer> players = List.generate(18, (index) {
-    return AudioPlayer();
-  });
-
   Future<void> prepare() async {
     _funkAudios = FunkAudioDataSource().getAudios();
     _funkAudios.forEach(loadPlayer);
@@ -29,7 +25,9 @@ class FunkPadViewModel with ChangeNotifier {
     audio.isPlaying = !audio.isPlaying;
     if (audio.isPlaying) {
       if (audio.type == FunkType.repeat) {
-        sincRepeatableAudios();
+        sincRepeatableAudios(index);
+        //audio.audioPlayer.setLoopMode(LoopMode.all);
+        //audio.audioPlayer.play();
       } else {
         audio.audioPlayer.playerStateStream.listen((playerState) {
           if (playerState.processingState == ProcessingState.completed) {
@@ -48,18 +46,20 @@ class FunkPadViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void sincRepeatableAudios() {
+  void sincRepeatableAudios(int newIndex) {
     var repeatAudios =
         _funkAudios.where((a) => a.type == FunkType.repeat && a.isPlaying);
 
     for (var a in repeatAudios) {
-      if (a.audioPlayer.playing) {
-        a.audioPlayer.stop();
+      if (a.id != newIndex) {
+        print("Audio reseted = ${a.id}");
+        a.audioPlayer.pause();
         a.audioPlayer.seek(Duration.zero);
       }
     }
 
     for (var a in repeatAudios) {
+      print("Audio restarted = ${a.id}");
       a.audioPlayer.setLoopMode(LoopMode.all);
       a.audioPlayer.play();
     }

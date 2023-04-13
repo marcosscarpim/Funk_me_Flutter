@@ -26,20 +26,22 @@ class _FunkPadState extends State<FunkPad> {
     var viewModel = Provider.of<FunkPadViewModel>(context);
     List<FunkAudio> audioList = viewModel.funkAudios;
 
-    return GridView.count(
-      padding: const EdgeInsets.all(5.0),
-      crossAxisSpacing: 5,
-      mainAxisSpacing: 5,
-      crossAxisCount: 3,
-      scrollDirection: Axis.horizontal,
-      children: List.generate(audioList.length, (index) {
-        return FunkButton(
-            audio: audioList[index],
-            onTap: (audio) {
-              print("Index = $index");
-              viewModel.updateAudio(index);
-            });
-      }),
+    return SafeArea(
+      child: GridView.count(
+        padding: const EdgeInsets.all(5.0),
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5,
+        crossAxisCount: 3,
+        scrollDirection: Axis.horizontal,
+        children: List.generate(audioList.length, (index) {
+          return FunkButton(
+              audio: audioList[index],
+              onTap: (audio) {
+                print("Index = $index");
+                viewModel.updateAudio(index);
+              });
+        }),
+      ),
     );
   }
 }
@@ -145,8 +147,6 @@ class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
                   color: color,
                   border: Border.all(color: color),
                   borderRadius: const BorderRadius.all(Radius.circular(20))),
-              width: 250,
-              height: 250,
             ),
             FadeTransition(
               opacity: _animation,
@@ -174,7 +174,7 @@ class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
                 curve: Curves.linear,
               )),
               child: Container(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(biggest.width / 10),
                 child: ImageIcon(_getIcon()),
               ),
             )
