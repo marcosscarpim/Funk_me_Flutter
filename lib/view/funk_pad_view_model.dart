@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:funk_me/player/funk_audio_player_impl.dart';
+import 'package:funk_me/player/funk_audio_player.dart';
 import 'package:funk_me/model/funk_audio.dart';
 
 class FunkPadViewModel with ChangeNotifier {
-  final FunkAudioPlayerImpl _audioPlayer = FunkAudioPlayerImpl();
+  final FunkAudioPlayer _audioPlayer;
+
+  FunkPadViewModel(this._audioPlayer);
 
   List<FunkAudio> _funkAudios = List.empty();
 
