@@ -33,14 +33,18 @@ class _FunkPadState extends State<FunkPad> {
         mainAxisSpacing: 5,
         crossAxisCount: 3,
         scrollDirection: Axis.horizontal,
-        children: List.generate(audioList.length, (index) {
-          return FunkButton(
+        children: List.generate(
+          audioList.length,
+          (index) {
+            return FunkButton(
               audio: audioList[index],
               onTap: (audio) {
-                print("Index = $index");
+                debugPrint("Index = $index");
                 viewModel.updateAudio(index);
-              });
-        }),
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -135,52 +139,68 @@ class _FunkButtonState extends State<FunkButton> with TickerProviderStateMixin {
     Color color = _getColor();
     return GestureDetector(
       onTap: _onButtonTapped,
-      child: LayoutBuilder(builder: (context, constraints) {
-        final Size biggest = constraints.biggest;
-        double smallIcon = constraints.biggest.width / 3;
-        double bigIcon = constraints.biggest.width / 1.5;
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final Size biggest = constraints.biggest;
+          double smallIcon = constraints.biggest.width / 3;
+          double bigIcon = constraints.biggest.width / 1.5;
 
-        return Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
+          return Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
                   color: color,
                   border: Border.all(color: color),
-                  borderRadius: const BorderRadius.all(Radius.circular(20))),
-            ),
-            FadeTransition(
-              opacity: _animation,
-              child: Container(
-                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                ),
+              ),
+              FadeTransition(
+                opacity: _animation,
+                child: Container(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: Colors.white),
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                width: 250,
-                height: 250,
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  width: 250,
+                  height: 250,
+                ),
               ),
-            ),
-            PositionedTransition(
-              rect: RelativeRectTween(
-                begin: RelativeRect.fromSize(
-                    Rect.fromLTWH(biggest.width - smallIcon,
-                        biggest.height - smallIcon, smallIcon, smallIcon),
-                    biggest),
-                end: RelativeRect.fromSize(
-                    Rect.fromLTWH((biggest.width - bigIcon) / 2,
-                        (biggest.height - bigIcon) / 2, bigIcon, bigIcon),
-                    biggest),
-              ).animate(CurvedAnimation(
-                parent: _controllerScale,
-                curve: Curves.linear,
-              )),
-              child: Container(
-                padding: EdgeInsets.all(biggest.width / 10),
-                child: ImageIcon(_getIcon()),
+              PositionedTransition(
+                rect: RelativeRectTween(
+                  begin: RelativeRect.fromSize(
+                    Rect.fromLTWH(
+                      biggest.width - smallIcon,
+                      biggest.height - smallIcon,
+                      smallIcon,
+                      smallIcon,
+                    ),
+                    biggest,
+                  ),
+                  end: RelativeRect.fromSize(
+                    Rect.fromLTWH(
+                      (biggest.width - bigIcon) / 2,
+                      (biggest.height - bigIcon) / 2,
+                      bigIcon,
+                      bigIcon,
+                    ),
+                    biggest,
+                  ),
+                ).animate(
+                  CurvedAnimation(
+                    parent: _controllerScale,
+                    curve: Curves.linear,
+                  ),
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(biggest.width / 10),
+                  child: ImageIcon(_getIcon()),
+                ),
               ),
-            )
-          ],
-        );
-      }),
+            ],
+          );
+        },
+      ),
     );
   }
 }
